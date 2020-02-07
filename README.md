@@ -1,2 +1,2 @@
-# WebUsuario-API
+# Boticario-Api
 Projeto WebAPI
