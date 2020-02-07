@@ -14,5 +14,6 @@ namespace Boticario.Api.Models
     public class BodyCashback
     {
         public int Credit { get; set; }
+        public string Message { get; set; }
     }
 }

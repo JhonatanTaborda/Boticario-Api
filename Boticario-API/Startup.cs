@@ -12,6 +12,13 @@ using Boticario.Api.Context;
 using Boticario.Api.Models;
 using Boticario.Api.Repository.Interfaces;
 using Boticario.Api.Repository;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using NSwag.AspNetCore;
+using System.Reflection;
+using NSwag.Generation.Processors.Security;
+using System.Linq;
+using NSwag;
+using System.Net;
 
 namespace Boticario.Api
 {
@@ -70,10 +77,22 @@ namespace Boticario.Api
                 };                
             }); 
 
-
-            services.AddSwaggerDocument(config => {
+            services.AddOpenApiDocument(config =>
+            {
                 config.DocumentName = "Boticario.Api";
+                config.Title = "Boticario.Api";
+                config.OperationProcessors.Add(new OperationSecurityScopeProcessor("Bearer"));
+                config.AddSecurity("Bearer", Enumerable.Empty<string>(),
+                    new OpenApiSecurityScheme()
+                    {
+                        Type = OpenApiSecuritySchemeType.ApiKey,
+                        Name = nameof(Authorization),
+                        In = OpenApiSecurityApiKeyLocation.Header,
+                        Description = "Insira o Token: Bearer {token}"
+                    }
+                );
             });
+
         }
                 
         public void Configure(IApplicationBuilder app, IHostingEnvironment env)
@@ -84,17 +103,10 @@ namespace Boticario.Api
             app.UseAuthentication();
             app.UseStaticFiles();
             app.UseIdentity();
-            app.UseMvc();
+            app.UseMvc();            
 
-
-            app.UseSwagger(config => {
-                config.DocumentName = "Boticario.Api";
-                config.Path = "/api/swagger.json";
-                config.PostProcess = (document, request) => { };
-            });
-
-            app.UseSwaggerUi3(config => {
-                config.DocumentPath = "/api/swagger.json";
+            app.UseOpenApi();
+            app.UseSwaggerUi3(config => {                
                 config.Path = "/api/swagger";
             });            
         }

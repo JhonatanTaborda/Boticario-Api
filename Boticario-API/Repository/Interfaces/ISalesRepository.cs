@@ -13,5 +13,6 @@ namespace Boticario.Api.Repository.Interfaces
         Task Delete(string Id);
         Task<IList<SalesModel>> GetAll();
         Task<SalesModel> Get(string id);
+        ServiceCashbackModel GetCashbackByUser(string cpf);
     }
 }

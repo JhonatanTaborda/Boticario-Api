@@ -58,5 +58,12 @@ namespace Boticario.Api.Controllers
 
             return Ok(resutl);
         }
+
+        [Authorize]
+        [HttpGet("CashbackByCpf/{cpf}")]
+        public ServiceCashbackModel GetCashbackByCpf([FromRoute] string cpf)
+        {
+            return _salesRepository.GetCashbackByUser(cpf);               
+        }
     }
 }

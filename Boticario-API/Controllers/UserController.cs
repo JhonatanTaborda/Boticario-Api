@@ -63,7 +63,7 @@ namespace Boticario.Api.Controllers
         public async Task<ActionResult> Logout([FromBody] UserInfo userInfo)
         {
             await _loginRepository.Logout(userInfo);
-
+            
             return Ok();
         }
         

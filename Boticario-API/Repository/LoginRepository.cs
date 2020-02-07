@@ -87,7 +87,7 @@ namespace Boticario.Api.Repository
         {
             await _signInManager.SignOutAsync();
             
-            var userApp = new ApplicationUser { Id = userInfo.Id, UserName = userInfo.Name, Email = userInfo.Email, SecurityStamp = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1bmlxdWVfbmFtZSI6InRlc3RlQGVtYWlsLmNvbSIsImh0dHA6Ly9zY2hlbWFzLnhtbHNvYXAub3JnL3dzLzIwMDUvMDUvaWRlbnRpdHkvY2xhaW1zL2VtYWlsYWRkcmVzcyI6InRlc3RlQGVtYWlsLmNvbSIsImp0aSI6IjVmYTA2NmQ1LTExMzgtNDc0YS04Yjg4LWIyODM3NDA1NmQwMyIsImV4cCI6MTU4MTA5ODIzM30.Ux3pmYWzXvbmf0o0LXCHnTcnKkADqr65hcggKeNS4CI" };
+            var userApp = new ApplicationUser { Id = userInfo.Id, UserName = userInfo.Name, Email = userInfo.Email, SecurityStamp = userInfo.Id };
 
             await _userManager.RemoveAuthenticationTokenAsync(userApp, "Bearer", userApp.Id);
         }
