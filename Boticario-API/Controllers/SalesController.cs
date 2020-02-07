@@ -1,15 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 using Boticario.Api.Models;
 using Boticario.Api.Repository.Interfaces;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Boticario.Api.Controllers
-{       
+{
     [Route("api/[controller]")]
     [ApiController]
     public class SalesController : ControllerBase

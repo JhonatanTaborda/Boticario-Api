@@ -1,18 +1,6 @@
-﻿using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Identity;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
-using Microsoft.IdentityModel.Tokens;
-using System;
 using System.Collections.Generic;
-using System.IdentityModel.Tokens.Jwt;
-using System.IO;
-using System.Linq;
-using System.Security.Claims;
-using System.Security.Cryptography;
-using System.Text;
 using System.Threading.Tasks;
 using Boticario.Api.Models;
 using Boticario.Api.Repository.Interfaces;
@@ -32,9 +20,9 @@ namespace Boticario.Api.Controllers
             _userRepository = userRepository;
             _loginRepository = loginRepository;
         }
-        
-        [HttpGet("Get")]
-        [AutoValidateAntiforgeryToken]
+
+        [Authorize]
+        [HttpGet]        
         public async Task<ActionResult<IList<ApplicationUser>>> GetAll()
         {
             var resutl = await _userRepository.GetAll();
@@ -43,15 +31,29 @@ namespace Boticario.Api.Controllers
         }
 
         [Authorize]
+        [HttpGet("{id}")]
+        public async Task<ActionResult<IList<ApplicationUser>>> Get([FromRoute] string id)
+        {
+            var resutl = await _userRepository.Get(id);
+
+            return Ok(resutl);
+        }
+
         [HttpPost("Save")]        
         public async Task<ActionResult<UserInfo>> CreateUser([FromBody] UserInfo model)
         {
-            return await _userRepository.CreateUser(model);
+            var userReturn = await _userRepository.CreateUser(model);
+
+            if (userReturn.IsValid)
+            {
+                return Ok(userReturn);
+            }
+            
+            return BadRequest(userReturn);
         }
 
         [HttpPost("Login")]
-        [AllowAnonymous]
-        [ValidateAntiForgeryToken]
+        [AllowAnonymous]        
         public async Task<ActionResult<UserTokenModel>> Login([FromBody] UserInfo userInfo)
         {
             return await _loginRepository.Auth(userInfo);
@@ -63,6 +65,13 @@ namespace Boticario.Api.Controllers
             await _loginRepository.Logout(userInfo);
 
             return Ok();
-        }                   
+        }
+        
+        [HttpPost("EncryptPassword")]
+        [AllowAnonymous]
+        public ActionResult<string> EncryptPassword([FromQuery] string password)
+        {
+            return _userRepository.EncryptPassword(password);
+        }
     }
 }

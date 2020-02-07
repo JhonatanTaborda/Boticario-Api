@@ -2,11 +2,14 @@
 using Microsoft.EntityFrameworkCore;
 using Boticario.Api.Models;
 using Boticario.Api.Models.Enums;
+using Microsoft.Extensions.Configuration;
 
 namespace Boticario.Api.Context
 {
     public class AppDbContext : IdentityDbContext<ApplicationUser>
-    {           
+    {
+        public IConfiguration Configuration { get; }
+
         public AppDbContext(DbContextOptions<AppDbContext> options) : base(options)
         { }
 
@@ -21,6 +24,18 @@ namespace Boticario.Api.Context
                 .IsRequired();
 
             base.OnModelCreating(builder);
+        }
+
+        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+        {
+            //builder.UseSqlServer(Configuration.GetConnectionString("DefaultConnection"));
+            //base.OnConfiguring(builder);
+
+            base.OnConfiguring(optionsBuilder);
+            var builder = new ConfigurationBuilder()
+                .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true);
+            IConfigurationRoot config = builder.Build();
+            optionsBuilder.UseSqlServer(config.GetConnectionString("DefaultConnection"));
         }
 
         public DbSet<SalesModel> Sales { get; set; }

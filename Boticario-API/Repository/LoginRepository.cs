@@ -1,21 +1,10 @@
-﻿using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
-using Microsoft.IdentityModel.Tokens;
 using System;
-using System.Collections.Generic;
-using System.IdentityModel.Tokens.Jwt;
-using System.IO;
-using System.Linq;
-using System.Security.Claims;
-using System.Security.Cryptography;
-using System.Text;
 using System.Threading.Tasks;
 using Boticario.Api.Models;
 using Boticario.Api.Repository.Interfaces;
+using Boticario.Api.Extensions;
 
 namespace Boticario.Api.Repository
 {
@@ -23,6 +12,7 @@ namespace Boticario.Api.Repository
     {        
         private readonly SignInManager<ApplicationUser> _signInManager;
         private readonly UserManager<ApplicationUser> _userManager;
+        private readonly IConfiguration _configuration;
         private readonly ApiExtensions _ext;
 
 
@@ -34,11 +24,12 @@ namespace Boticario.Api.Repository
         /// <param name="configuration"></param>
         public LoginRepository(UserManager<ApplicationUser> userManager,
             SignInManager<ApplicationUser> signInManager,
-            ApiExtensions ext)
+            IConfiguration configuration)
         {
             _userManager = userManager;
             _signInManager = signInManager;
-            _ext = ext;
+            _configuration = configuration;
+            _ext = new ApiExtensions(_configuration);
         }
 
         /// <summary>
@@ -56,18 +47,27 @@ namespace Boticario.Api.Repository
 
                 if (password.Succeeded)
                 {
-                    await _signInManager.SignInAsync(user, isPersistent: true);
-                    
-                    var result = await _signInManager.CanSignInAsync(user);
-                                                 
-                    if (result)
+                    try
                     {
-                        var tokenModel = _ext.BuildToken(userInfo);
+                        await _signInManager.SignInAsync(user, isPersistent: true);
 
-                        await _userManager.SetAuthenticationTokenAsync(user, "Bearer", user.Id, tokenModel.AccessToken);                                                
+                        var result = await _signInManager.CanSignInAsync(user);
+
+                        if (result)
+                        {
+                            var tokenModel = _ext.BuildToken(userInfo);
+
+                            await _userManager.SetAuthenticationTokenAsync(user, "Bearer", user.Id, tokenModel.AccessToken);
+                                                                    
+                            return tokenModel;
+                        }
+
+                        return new UserTokenModel { Message = "Não foi possível realizar o login, tente novamente por favor!" };
                     }
-
-                    return new UserTokenModel { Message = "Erro ao tetar realizar o Login!" };
+                    catch (Exception)
+                    {                                                                             
+                        return new UserTokenModel { Message = "Erro ao tetar realizar o Login!" };
+                    }                   
                 }
                 else
                 {
@@ -87,7 +87,7 @@ namespace Boticario.Api.Repository
         {
             await _signInManager.SignOutAsync();
             
-            var userApp = new ApplicationUser { Id = userInfo.Id, UserName = userInfo.Name, Email = userInfo.Email };
+            var userApp = new ApplicationUser { Id = userInfo.Id, UserName = userInfo.Name, Email = userInfo.Email, SecurityStamp = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1bmlxdWVfbmFtZSI6InRlc3RlQGVtYWlsLmNvbSIsImh0dHA6Ly9zY2hlbWFzLnhtbHNvYXAub3JnL3dzLzIwMDUvMDUvaWRlbnRpdHkvY2xhaW1zL2VtYWlsYWRkcmVzcyI6InRlc3RlQGVtYWlsLmNvbSIsImp0aSI6IjVmYTA2NmQ1LTExMzgtNDc0YS04Yjg4LWIyODM3NDA1NmQwMyIsImV4cCI6MTU4MTA5ODIzM30.Ux3pmYWzXvbmf0o0LXCHnTcnKkADqr65hcggKeNS4CI" };
 
             await _userManager.RemoveAuthenticationTokenAsync(userApp, "Bearer", userApp.Id);
         }

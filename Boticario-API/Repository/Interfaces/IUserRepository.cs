@@ -11,5 +11,6 @@ namespace Boticario.Api.Repository.Interfaces
         Task<IList<ApplicationUser>> GetAll();   
         Task<ApplicationUser> Get(string idUser);
         Task<UserInfo> CreateUser([FromBody] UserInfo model);
+        string EncryptPassword(string input);
     }
 }

@@ -1,21 +1,12 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.IdentityModel.Tokens.Jwt;
-using System.Linq;
-using System.Security.Claims;
 using System.Text;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using Boticario.Api.Context;
 using Boticario.Api.Models;
@@ -37,7 +28,7 @@ namespace Boticario.Api
         {
             services.AddDbContext<AppDbContext>(options =>
             options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
-
+             
             services
                 .AddIdentity<ApplicationUser, IdentityRole>(options =>
             {
@@ -50,27 +41,23 @@ namespace Boticario.Api
                 .AddEntityFrameworkStores<AppDbContext>()
                 .AddDefaultTokenProviders();
 
-            //services.AddDbContext<AppDbContext>(options =>
-            //    options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection"), o => o.MigrationsAssembly("Boticario.Api"))
-            //);
+            services.AddEntityFrameworkSqlServer()                
+                .AddDbContext<AppDbContext>(options =>
+                    options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
 
             services                
                 .AddTransient<IUserRepository, UserRepository>()
-                .AddTransient<ILoginRepository, LoginRepository>();
-
-
-            services.AddSwaggerDocument(config => {
-                config.DocumentName = "Boticario.Api";
-            });
+                .AddTransient<ILoginRepository, LoginRepository>()
+                .AddTransient<ISalesRepository, SalesRepository>();                                   
 
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
-               
-            services.AddAuthentication(options =>
-            {
+                                    
+            
+            services.AddAuthentication(options => {
                 options.DefaultAuthenticateScheme = "JwtBearer";
                 options.DefaultChallengeScheme = "JwtBearer";
-            }) //(JwtBearerDefaults.AuthenticationScheme)
-            .AddJwtBearer(options =>
+            })
+            .AddJwtBearer("JwtBearer", options =>
             {
                 options.TokenValidationParameters = new TokenValidationParameters
                 {
@@ -80,28 +67,24 @@ namespace Boticario.Api
                     ValidateIssuerSigningKey = true,
                     IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Configuration["jwt:key"])),
                     ClockSkew = TimeSpan.Zero
-                };
-                options.Events = new JwtBearerEvents
-                {
-                    OnAuthenticationFailed = context =>
-                    {
-                        if (context.Exception.GetType() == typeof(SecurityTokenExpiredException))
-                        {
-                            context.Response.Headers.Add("Token-Expired", "true");
-                        }
-                        return Task.CompletedTask;
-                    }
-                };
+                };                
             }); 
+
+
+            services.AddSwaggerDocument(config => {
+                config.DocumentName = "Boticario.Api";
+            });
         }
                 
         public void Configure(IApplicationBuilder app, IHostingEnvironment env)
         {            
             app.UseDeveloperExceptionPage();
-            
-            ////ConfigureOAuth(app);                        
-            app.UseAuthentication();            
+                       
+            app.UseHttpsRedirection();
+            app.UseAuthentication();
+            app.UseStaticFiles();
             app.UseIdentity();
+            app.UseMvc();
 
 
             app.UseSwagger(config => {
@@ -115,21 +98,5 @@ namespace Boticario.Api
                 config.Path = "/api/swagger";
             });            
         }
-
-        ////public void ConfigureOAuth(IApplicationBuilder app)
-        ////{
-        ////    OAuthAuthorizationServerOptions OAuthServerOptions = new OAuthAuthorizationServerOptions()
-        ////    {
-        ////        AllowInsecureHttp = true,
-        ////        TokenEndpointPath = new PathString("/token"),
-        ////        AccessTokenExpireTimeSpan = TimeSpan.FromDays(1),
-        ////        Provider = new SimpleAuthorizationServerProvider()
-        ////    };
-
-        ////    // Token Generation
-        ////    app.UseOAuthAuthorizationServer(OAuthServerOptions);
-        ////    app.UseOAuthBearerAuthentication(new OAuthBearerAuthenticationOptions());
-
-        ////}
     }
 }

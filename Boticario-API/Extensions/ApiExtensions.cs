@@ -6,12 +6,11 @@ using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
 using Boticario.Api.Models;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 
-namespace Boticario.Api
+namespace Boticario.Api.Extensions
 {
-    public class ApiExtensions : ControllerBase
+    public class ApiExtensions
     {
         private readonly IConfiguration _configuration;
 
@@ -45,6 +44,35 @@ namespace Boticario.Api
             memoryStream.Close();
             cryptoStream.Close();
             return Encoding.UTF8.GetString(plainTextBytes, 0, decryptedByteCount).TrimEnd("\0".ToCharArray());
+        }
+
+        /// <summary>
+        /// Método utilizado para criptografar a senha do usuário
+        /// </summary>
+        /// <param name="input">string</param>
+        /// <returns>string</returns>
+        public string EncryptHash(string input)
+        {
+            byte[] plainTextBytes = Encoding.UTF8.GetBytes(input);
+
+            byte[] keyBytes = new Rfc2898DeriveBytes(PasswordHash, Encoding.ASCII.GetBytes(SaltKey)).GetBytes(256 / 8);
+            var symmetricKey = new RijndaelManaged() { Mode = CipherMode.CBC, Padding = PaddingMode.Zeros };
+            var encryptor = symmetricKey.CreateEncryptor(keyBytes, Encoding.ASCII.GetBytes(VIKey));
+
+            byte[] cipherTextBytes;
+
+            using (var memoryStream = new MemoryStream())
+            {
+                using (var cryptoStream = new CryptoStream(memoryStream, encryptor, CryptoStreamMode.Write))
+                {
+                    cryptoStream.Write(plainTextBytes, 0, plainTextBytes.Length);
+                    cryptoStream.FlushFinalBlock();
+                    cipherTextBytes = memoryStream.ToArray();
+                    cryptoStream.Close();
+                }
+                memoryStream.Close();
+            }
+            return Convert.ToBase64String(cipherTextBytes);
         }
 
         /// <summary>

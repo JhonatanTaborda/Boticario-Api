@@ -28,6 +28,8 @@ namespace Boticario.Api.Repository.Validate
 
         public async Task SalesValidate()
         {
+            Model.IsValid = true;
+
             if (Model.Value <= 0)
             {
                 Model.IsValid = false;

@@ -1,4 +1,5 @@
-﻿using Boticario.Api.Models;
+﻿using Boticario.Api.Extensions;
+using Boticario.Api.Models;
 using Boticario.Api.Repository.Interfaces;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
@@ -39,7 +40,7 @@ namespace Boticario.Api.Repository.Validate
         {
             Model.IsValid = true;
 
-            if(Regex.IsMatch(Model.Email, @"^([\w-\.]+)@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.)|(([\w-]+\.)+))([a-zA-Z]{2,4}|[0-9]{1,3})(\]?)$"))
+            if(!Regex.IsMatch(Model.Email, @"^([\w-\.]+)@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.)|(([\w-]+\.)+))([a-zA-Z]{2,4}|[0-9]{1,3})(\]?)$"))
             {
                 Model.IsValid = false;
                 Model.Message = "Formato de Email inválido"; 

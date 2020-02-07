@@ -15,12 +15,9 @@ namespace Boticario.Api.Models
         public string SkuProduct { get; set; }
         public decimal Value { get; set; }
         public int PercentCacheBack { get; set; }
-        public decimal ValueCacheBack { get; set; }
-
-        [Required]        
+        public decimal ValueCacheBack { get; set; }                
         public SalesStatus Status { get; set; }
-        public string IdApplicationUser { get; set; }
-        [Required]
+        public string IdApplicationUser { get; set;}        
         [ForeignKey("IdApplicationUser")]
         public ApplicationUser Revendedor { get; set; }
     }

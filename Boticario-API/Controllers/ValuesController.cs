@@ -8,7 +8,7 @@ namespace Boticario.Api.Controllers
     [ApiController]
     public class ValuesController : ControllerBase
     {
-        [Authorize]
+
         // GET api/values
         [HttpGet]
         public ActionResult<IEnumerable<string>> Get()
@@ -16,7 +16,7 @@ namespace Boticario.Api.Controllers
             return new string[] { "1", "2","3", "4" };
         }
 
-        [Authorize]
+
         // GET api/values/5
         [HttpGet("{id}")]
         public ActionResult<string> Get(int id)
