@@ -8,6 +8,7 @@ using Boticario.Api.Models;
 using Boticario.Api.Repository.Interfaces;
 using Boticario.Api.Repository.Validate;
 using Boticario.Api.Extensions;
+using Microsoft.Extensions.Logging;
 
 namespace Boticario.Api.Repository
 {
@@ -15,13 +16,22 @@ namespace Boticario.Api.Repository
     {
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly IConfiguration _configuration;
+        private ILogger _logger;
         private readonly ApiExtensions _ext;
 
+        /// <summary>
+        /// Contrutor da classe
+        /// </summary>
+        /// <param name="userManager"></param>
+        /// <param name="configuration"></param>
+        /// <param name="logger"></param>
         public UserRepository(UserManager<ApplicationUser> userManager,
-                            IConfiguration configuration)
+                            IConfiguration configuration,
+                            ILogger<UserRepository> logger)
         {
             _userManager = userManager;
             _configuration = configuration;
+            _logger = logger;
             _ext = new ApiExtensions(_configuration);
         }
 
@@ -56,6 +66,8 @@ namespace Boticario.Api.Repository
             var _val = new UserVal(model, _userManager, _ext);
             await _val.UserValidate();
 
+            _logger.LogInformation("Usuário " + model.Name + "|" + model.CPF + ", isValid=" + model.IsValid.ToString() + (model.IsValid ? "" : " - Erro: " + model.Message));
+
             if (model.IsValid) {
                 
                 var user = new ApplicationUser { UserName = model.Name, Email = model.Email, PasswordHash = model.Password, CPF = model.CPF };
@@ -69,9 +81,13 @@ namespace Boticario.Api.Repository
 
                     user.Id = model.Id;
                     await _userManager.AddClaimAsync(user, new Claim(ClaimTypes.Role, "Revendedor"));
+
+                    _logger.LogInformation("Usuário " + model.Name + "|" + model.CPF + ", criado com id:'" + model.Id + "'");
                 }
                 else
                 {
+                    _logger.LogWarning("Erro ao tentar criar Usuário " + model.Name + "|" + model.CPF + ", Err.:" + result.Errors.ToString());
+
                     return new UserInfo
                     {
                         IsValid = result.Succeeded,

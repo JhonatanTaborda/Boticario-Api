@@ -5,3 +5,6 @@
 /Boticario-API/bin/Debug/netcoreapp2.2
 /.vs/Boticario.Api/v16/Server/sqlite3
 /Boticario-API/obj
+/Boticario.Api.Test/bin/Debug/netcoreapp3.1
+/Boticario.Api.Test/obj
+/Boticario.Api.UnitTests/obj

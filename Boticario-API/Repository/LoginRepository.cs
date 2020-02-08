@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Boticario.Api.Models;
 using Boticario.Api.Repository.Interfaces;
 using Boticario.Api.Extensions;
+using Microsoft.Extensions.Logging;
 
 namespace Boticario.Api.Repository
 {
@@ -14,7 +15,7 @@ namespace Boticario.Api.Repository
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly IConfiguration _configuration;
         private readonly ApiExtensions _ext;
-
+        private ILogger _logger;
 
         /// <summary>
         /// Construtor da Classe
@@ -22,13 +23,16 @@ namespace Boticario.Api.Repository
         /// <param name="userManager"></param>
         /// <param name="signInManager"></param>
         /// <param name="configuration"></param>
+        /// <param name="logger"></param>
         public LoginRepository(UserManager<ApplicationUser> userManager,
             SignInManager<ApplicationUser> signInManager,
-            IConfiguration configuration)
+            IConfiguration configuration,
+            ILogger<LoginRepository> logger)
         {
             _userManager = userManager;
             _signInManager = signInManager;
             _configuration = configuration;
+            _logger = logger;
             _ext = new ApiExtensions(_configuration);
         }
 
@@ -58,24 +62,30 @@ namespace Boticario.Api.Repository
                             var tokenModel = _ext.BuildToken(userInfo);
 
                             await _userManager.SetAuthenticationTokenAsync(user, "Bearer", user.Id, tokenModel.AccessToken);
-                                                                    
+
+                            _logger.LogInformation("Usuário " + userInfo.Name + "|" + userInfo.CPF + " autenticado no sistema.");
+
                             return tokenModel;
                         }
 
+                        _logger.LogInformation("Usuário " + userInfo.Name + "|" + userInfo.CPF + " não autenticado no sistema.");
                         return new UserTokenModel { Message = "Não foi possível realizar o login, tente novamente por favor!" };
                     }
-                    catch (Exception)
-                    {                                                                             
+                    catch (Exception ex)
+                    {
+                        _logger.LogError(ex, "LoginController - UserId=" + user.Id + " Message:" + ex.Message);
                         return new UserTokenModel { Message = "Erro ao tetar realizar o Login!" };
                     }                   
                 }
                 else
                 {
+                    _logger.LogInformation("Usuário " + userInfo.Name + "|" + userInfo.CPF + " informou senha errada.");
                     return new UserTokenModel { Message = "Senha inválida" }; 
                 }
             }
             else
             {
+                _logger.LogInformation("Email " + userInfo.Email + " não encontrado.");
                 return new UserTokenModel { Message = "Email não encontrado!" };               
             }
         }
@@ -90,6 +100,8 @@ namespace Boticario.Api.Repository
             var userApp = new ApplicationUser { Id = userInfo.Id, UserName = userInfo.Name, Email = userInfo.Email, SecurityStamp = userInfo.Id };
 
             await _userManager.RemoveAuthenticationTokenAsync(userApp, "Bearer", userApp.Id);
+
+            _logger.LogInformation("Usuário " + userInfo.Name + "|" + userInfo.CPF + " desconectou do sistema.");
         }
     }
 }

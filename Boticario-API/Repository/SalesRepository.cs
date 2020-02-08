@@ -11,6 +11,7 @@ using Boticario.Api.Repository.Validate;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 
 namespace Boticario.Api.Repository
@@ -19,15 +20,24 @@ namespace Boticario.Api.Repository
     {
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly IConfiguration _configuration;
+        private readonly ILogger _logger;
 
         private static string _urlService;
         private static string _tokenService;
 
+        /// <summary>
+        /// Construtor da classe
+        /// </summary>
+        /// <param name="userManager"></param>
+        /// <param name="configuration"></param>
+        /// <param name="logger"></param>
         public SalesRepository(UserManager<ApplicationUser> userManager,
-                IConfiguration configuration)
+                IConfiguration configuration,
+                ILogger<SalesRepository> logger)
         {
             _userManager = userManager;
             _configuration = configuration;
+            _logger = logger;
         }
 
         /// <summary>
@@ -41,6 +51,8 @@ namespace Boticario.Api.Repository
             var _val = new SalesVal(model, _configuration, _userManager);
             await _val.SalesValidate();
 
+            _logger.LogInformation("Criar Compra " + model.SkuProduct + "|" + model.Date + "|" + model.IdApplicationUser +", isValid=" + model.IsValid.ToString() + (model.IsValid ? "" : " - Erro: " + model.Message));
+
             if (model.IsValid)
             {
                 var _biz = new SalesBiz(model);
@@ -52,7 +64,9 @@ namespace Boticario.Api.Repository
                     context.Sales.Add(model);
 
                     context.SaveChanges();                    
-                }               
+                }
+
+                _logger.LogInformation("Compra " + model.SkuProduct + "|" + model.Date + "|" + model.IdApplicationUser + ", criada com id:'" + model.Id + "'");
             }
             
             return model;
@@ -69,9 +83,13 @@ namespace Boticario.Api.Repository
             var _val = new SalesVal(model, _configuration, _userManager);
             _val.ChangeValidate();
 
+            _logger.LogInformation("Alterar Compra id:'" + model.Id + "', isValid=" + model.IsValid.ToString() + (model.IsValid ? "" : " - Erro: " + model.Message));
+
             if (model.IsValid)
             {
                 await _val.SalesValidate();
+
+                _logger.LogInformation("Alterar Compra id:'" + model.Id + "', isValid=" + model.IsValid.ToString() + (model.IsValid ? "" : " - Erro: " + model.Message));
             }
 
             if (model.IsValid)
@@ -86,6 +104,8 @@ namespace Boticario.Api.Repository
 
                     context.SaveChanges();
                 }
+                
+                _logger.LogInformation("Compra id:'" + model.Id + "|" + model.SkuProduct + "|" + model.Date + "|" + model.IdApplicationUser + ", alterada.");
             }
 
             return model;
@@ -108,10 +128,14 @@ namespace Boticario.Api.Repository
                     var _val = new SalesVal(model, _configuration, _userManager);
                     _val.ChangeValidate();
 
+                    _logger.LogInformation("Excluir Compra id:'" + model.Id + "', isValid=" + model.IsValid.ToString() + (model.IsValid ? "" : " - Erro: " + model.Message));
+
                     if (model.IsValid)
                     {
                         context.Remove(model);
                         context.SaveChanges();
+
+                        _logger.LogInformation("Excluir Compra id:'" + model.Id + "', excluída.");
                     }                    
                 }
                 
@@ -163,12 +187,11 @@ namespace Boticario.Api.Repository
                     new MediaTypeWithQualityHeaderValue("application/json"));
                 client.DefaultRequestHeaders.Add("token", _tokenService);
 
-                // Envio da requisição a fim de autenticar
-                // e obter o token de acesso
                 HttpResponseMessage response = client.GetAsync(_urlService + cpf).Result;
 
                 string conteudo = response.Content.ReadAsStringAsync().Result;
-                                      
+
+                _logger.LogInformation("Consulta de cashback realizada para Cpf:" + cpf + ", result:" + conteudo);
 
                 if (response.StatusCode == HttpStatusCode.OK)
                 {

@@ -12,30 +12,31 @@ using Boticario.Api.Context;
 using Boticario.Api.Models;
 using Boticario.Api.Repository.Interfaces;
 using Boticario.Api.Repository;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
-using NSwag.AspNetCore;
-using System.Reflection;
 using NSwag.Generation.Processors.Security;
 using System.Linq;
 using NSwag;
 using System.Net;
+using Microsoft.Extensions.Logging;
 
 namespace Boticario.Api
 {
     public class Startup
     {
-        public Startup(IConfiguration configuration)
+        private ILoggerFactory _loggerFactory;
+        public IConfiguration Configuration { get; }
+
+
+        public Startup(IConfiguration configuration)////, ILoggerFactory loggerFactory)
         {
             Configuration = configuration;
-        }
-
-        public IConfiguration Configuration { get; }
+            ////_loggerFactory = loggerFactory;
+        }        
                 
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddDbContext<AppDbContext>(options =>
             options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
-             
+
             services
                 .AddIdentity<ApplicationUser, IdentityRole>(options =>
             {
@@ -95,8 +96,12 @@ namespace Boticario.Api
 
         }
                 
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env)
-        {            
+        public void Configure(IApplicationBuilder app, IHostingEnvironment env,
+                        ILoggerFactory loggerFactory)
+        {
+            loggerFactory
+                .AddConsole();
+                       
             app.UseDeveloperExceptionPage();
                        
             app.UseHttpsRedirection();
@@ -108,7 +113,7 @@ namespace Boticario.Api
             app.UseOpenApi();
             app.UseSwaggerUi3(config => {                
                 config.Path = "/api/swagger";
-            });            
+            });                        
         }
     }
 }
