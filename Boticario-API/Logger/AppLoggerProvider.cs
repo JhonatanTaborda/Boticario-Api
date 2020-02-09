@@ -1,7 +1,7 @@
 ﻿using System;
 using Microsoft.Extensions.Logging;
 
-namespace Boticario.Api.ExtensionLogger
+namespace Boticario.Api.Logger
 {
     public class AppLoggerProvider : ILoggerProvider
     {

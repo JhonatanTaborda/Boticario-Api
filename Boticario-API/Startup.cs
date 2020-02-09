@@ -3,7 +3,7 @@ using System.Linq;
 using System.Net;
 using System.Text;
 using Boticario.Api.Context;
-using Boticario.Api.ExtensionLogger;
+using Boticario.Api.Logger;
 using Boticario.Api.Models;
 using Boticario.Api.Repository.Interfaces;
 using Boticario.Api.Repository;
