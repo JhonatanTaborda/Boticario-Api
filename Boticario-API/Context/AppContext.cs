@@ -23,14 +23,15 @@ namespace Boticario.Api.Context
                 //.HasColumnType("int")
                 .IsRequired();
 
+            builder.Entity<LogModel>()
+                .Property(p => p.Id)
+                .ValueGeneratedOnAdd();
+
             base.OnModelCreating(builder);
         }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            //builder.UseSqlServer(Configuration.GetConnectionString("DefaultConnection"));
-            //base.OnConfiguring(builder);
-
             base.OnConfiguring(optionsBuilder);
             var builder = new ConfigurationBuilder()
                 .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true);
@@ -39,6 +40,7 @@ namespace Boticario.Api.Context
         }
 
         public DbSet<SalesModel> Sales { get; set; }
+        public DbSet<LogModel> Log { get; set; }
     }
 
     ////public class AppDbContext : DbContext

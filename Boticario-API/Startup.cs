@@ -1,5 +1,12 @@
 ﻿using System;
+using System.Linq;
+using System.Net;
 using System.Text;
+using Boticario.Api.Context;
+using Boticario.Api.ExtensionLogger;
+using Boticario.Api.Models;
+using Boticario.Api.Repository.Interfaces;
+using Boticario.Api.Repository;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
@@ -8,28 +15,20 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
-using Boticario.Api.Context;
-using Boticario.Api.Models;
-using Boticario.Api.Repository.Interfaces;
-using Boticario.Api.Repository;
-using NSwag.Generation.Processors.Security;
-using System.Linq;
-using NSwag;
-using System.Net;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
+using NSwag;
+using NSwag.Generation.Processors.Security;
 
 namespace Boticario.Api
 {
     public class Startup
     {
-        private ILoggerFactory _loggerFactory;
         public IConfiguration Configuration { get; }
-
-
-        public Startup(IConfiguration configuration)////, ILoggerFactory loggerFactory)
+                        
+        public Startup(IConfiguration configuration)
         {
-            Configuration = configuration;
-            ////_loggerFactory = loggerFactory;
+            Configuration = configuration;            
         }        
                 
         public void ConfigureServices(IServiceCollection services)
@@ -99,9 +98,8 @@ namespace Boticario.Api
         public void Configure(IApplicationBuilder app, IHostingEnvironment env,
                         ILoggerFactory loggerFactory)
         {
-            loggerFactory
-                .AddConsole();
-                       
+            loggerFactory.AddContext(LogLevel.Information);
+
             app.UseDeveloperExceptionPage();
                        
             app.UseHttpsRedirection();

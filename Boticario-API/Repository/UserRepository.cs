@@ -66,7 +66,7 @@ namespace Boticario.Api.Repository
             var _val = new UserVal(model, _userManager, _ext);
             await _val.UserValidate();
 
-            _logger.LogInformation("Usuário " + model.Name + "|" + model.CPF + ", isValid=" + model.IsValid.ToString() + (model.IsValid ? "" : " - Erro: " + model.Message));
+            _logger.LogInformation(1002, "Usuário " + model.Name + "|" + model.CPF + ", isValid=" + model.IsValid.ToString() + (model.IsValid ? "" : " - Erro: " + model.Message));
 
             if (model.IsValid) {
                 
@@ -82,11 +82,11 @@ namespace Boticario.Api.Repository
                     user.Id = model.Id;
                     await _userManager.AddClaimAsync(user, new Claim(ClaimTypes.Role, "Revendedor"));
 
-                    _logger.LogInformation("Usuário " + model.Name + "|" + model.CPF + ", criado com id:'" + model.Id + "'");
+                    _logger.LogInformation(1002, "Usuário " + model.Name + "|" + model.CPF + ", criado com id:'" + model.Id + "'");
                 }
                 else
                 {
-                    _logger.LogWarning("Erro ao tentar criar Usuário " + model.Name + "|" + model.CPF + ", Err.:" + result.Errors.ToString());
+                    _logger.LogError("Erro ao tentar criar Usuário " + model.Name + "|" + model.CPF + ", Err.:" + result.Errors.ToString());
 
                     return new UserInfo
                     {

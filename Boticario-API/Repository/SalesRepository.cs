@@ -51,7 +51,7 @@ namespace Boticario.Api.Repository
             var _val = new SalesVal(model, _configuration, _userManager);
             await _val.SalesValidate();
 
-            _logger.LogInformation("Criar Compra " + model.SkuProduct + "|" + model.Date + "|" + model.IdApplicationUser +", isValid=" + model.IsValid.ToString() + (model.IsValid ? "" : " - Erro: " + model.Message));
+            _logger.LogInformation(1002, "Criar Compra " + model.SkuProduct + "|" + model.Date + "|" + model.IdApplicationUser +", isValid=" + model.IsValid.ToString() + (model.IsValid ? "" : " - Erro: " + model.Message));
 
             if (model.IsValid)
             {
@@ -66,7 +66,7 @@ namespace Boticario.Api.Repository
                     context.SaveChanges();                    
                 }
 
-                _logger.LogInformation("Compra " + model.SkuProduct + "|" + model.Date + "|" + model.IdApplicationUser + ", criada com id:'" + model.Id + "'");
+                _logger.LogInformation(1002, "Compra " + model.SkuProduct + "|" + model.Date + "|" + model.IdApplicationUser + ", criada com id:'" + model.Id + "'");
             }
             
             return model;
@@ -83,13 +83,13 @@ namespace Boticario.Api.Repository
             var _val = new SalesVal(model, _configuration, _userManager);
             _val.ChangeValidate();
 
-            _logger.LogInformation("Alterar Compra id:'" + model.Id + "', isValid=" + model.IsValid.ToString() + (model.IsValid ? "" : " - Erro: " + model.Message));
+            _logger.LogInformation(1002, "Alterar Compra id:'" + model.Id + "', isValid=" + model.IsValid.ToString() + (model.IsValid ? "" : " - Erro: " + model.Message));
 
             if (model.IsValid)
             {
                 await _val.SalesValidate();
 
-                _logger.LogInformation("Alterar Compra id:'" + model.Id + "', isValid=" + model.IsValid.ToString() + (model.IsValid ? "" : " - Erro: " + model.Message));
+                _logger.LogInformation(1002, "Alterar Compra id:'" + model.Id + "', isValid=" + model.IsValid.ToString() + (model.IsValid ? "" : " - Erro: " + model.Message));
             }
 
             if (model.IsValid)
@@ -105,7 +105,7 @@ namespace Boticario.Api.Repository
                     context.SaveChanges();
                 }
                 
-                _logger.LogInformation("Compra id:'" + model.Id + "|" + model.SkuProduct + "|" + model.Date + "|" + model.IdApplicationUser + ", alterada.");
+                _logger.LogInformation(1002, "Compra id:'" + model.Id + "|" + model.SkuProduct + "|" + model.Date + "|" + model.IdApplicationUser + ", alterada.");
             }
 
             return model;
@@ -128,14 +128,14 @@ namespace Boticario.Api.Repository
                     var _val = new SalesVal(model, _configuration, _userManager);
                     _val.ChangeValidate();
 
-                    _logger.LogInformation("Excluir Compra id:'" + model.Id + "', isValid=" + model.IsValid.ToString() + (model.IsValid ? "" : " - Erro: " + model.Message));
+                    _logger.LogInformation(1002, "Excluir Compra id:'" + model.Id + "', isValid=" + model.IsValid.ToString() + (model.IsValid ? "" : " - Erro: " + model.Message));
 
                     if (model.IsValid)
                     {
                         context.Remove(model);
                         context.SaveChanges();
 
-                        _logger.LogInformation("Excluir Compra id:'" + model.Id + "', excluída.");
+                        _logger.LogInformation(1002, "Excluir Compra id:'" + model.Id + "', excluída.");
                     }                    
                 }
                 
@@ -191,7 +191,7 @@ namespace Boticario.Api.Repository
 
                 string conteudo = response.Content.ReadAsStringAsync().Result;
 
-                _logger.LogInformation("Consulta de cashback realizada para Cpf:" + cpf + ", result:" + conteudo);
+                _logger.LogInformation(1002, "Consulta de cashback realizada para Cpf:" + cpf + ", result:" + conteudo);
 
                 if (response.StatusCode == HttpStatusCode.OK)
                 {
