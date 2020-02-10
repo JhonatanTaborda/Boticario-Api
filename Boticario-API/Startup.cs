@@ -111,7 +111,15 @@ namespace Boticario.Api
             app.UseOpenApi();
             app.UseSwaggerUi3(config => {                
                 config.Path = "/api/swagger";
-            });                        
+            });
+
+
+            //cria o database caso não exista ou aplica a migration que estiver pendente
+            using (var serviceScope = app.ApplicationServices.GetService<IServiceScopeFactory>().CreateScope())
+            {
+                var context = serviceScope.ServiceProvider.GetRequiredService<AppDbContext>();
+                context.Database.Migrate();
+            }
         }
     }
 }

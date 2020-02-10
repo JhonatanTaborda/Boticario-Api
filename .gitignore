@@ -9,3 +9,6 @@
 /Boticario.Api.Test/obj
 /Boticario.Api.UnitTests/obj
 /Boticario.Api.UnitTests/bin/Debug/netcoreapp3.1
+/.vs/Boticario.Api/v16/TestStore/0
+/Boticario.Api.Tests/bin/Debug
+/Boticario.Api.Tests/obj

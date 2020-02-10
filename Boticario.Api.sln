@@ -10,6 +10,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		.editorconfig = .editorconfig
 	EndProjectSection
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Boticario.Api.Tests", "Boticario.Api.Tests\Boticario.Api.Tests.csproj", "{B571C648-C4C1-4E3D-A797-E73132AA4D86}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -20,6 +22,10 @@ Global
 		{4D09827E-C9BD-4075-A0A0-7B161FD2182C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{4D09827E-C9BD-4075-A0A0-7B161FD2182C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{4D09827E-C9BD-4075-A0A0-7B161FD2182C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B571C648-C4C1-4E3D-A797-E73132AA4D86}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B571C648-C4C1-4E3D-A797-E73132AA4D86}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B571C648-C4C1-4E3D-A797-E73132AA4D86}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B571C648-C4C1-4E3D-A797-E73132AA4D86}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
